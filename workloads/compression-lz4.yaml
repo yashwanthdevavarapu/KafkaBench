@@ -1,0 +1,16 @@
+# Effect of producer-side compression on throughput and CPU.
+name: compression
+description: 4 KiB semi-compressible payloads, unthrottled, compared across codecs via separate runs.
+topic: kafkacore-compress
+partitions: 6
+replicationFactor: 3
+messageSizeBytes: 4096
+producers: 2
+consumers: 2
+targetRatePerSec: 0
+durationSec: 15
+warmupSec: 3
+producerConfig:
+  compression.type: lz4
+  linger.ms: "20"
+  batch.size: "262144"

@@ -1,0 +1,13 @@
+# Latency under increasing offered load: finds the knee where p99 starts climbing.
+name: load-ramp
+description: Fixed 1 KiB messages, target rate stepped from 500 to 4k msg/s (laptop-sized; multiply on real hardware).
+topic: kafkacore-ramp
+partitions: 6
+replicationFactor: 3
+messageSizeBytes: 1024
+producers: 2
+consumers: 2
+durationSec: 15
+warmupSec: 3
+sweep:
+  targetRatePerSec: [500, 1000, 2000, 4000]

@@ -1,0 +1,12 @@
+# Fast sanity check (~15 s): proves the pipeline end to end. Used by CI and the integration tests.
+name: smoke
+description: Small paced workload to validate produce -> consume -> verify.
+topic: kafkacore-smoke
+partitions: 3
+replicationFactor: 3
+messageSizeBytes: 512
+producers: 1
+consumers: 1
+targetRatePerSec: 2000
+durationSec: 10
+warmupSec: 3

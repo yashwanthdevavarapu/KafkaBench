@@ -1,0 +1,8 @@
+# Thresholds for `kafkacore bench compare` / `--baseline` (see ADR-0008).
+maxThroughputDropPct: 10        # FAIL if msg/s or MB/s drops more than 10 %
+maxPublishP95IncreasePct: 20
+maxPublishP99IncreasePct: 25
+maxEndToEndP99IncreasePct: 30
+warnFraction: 0.5               # WARN once half of a threshold is consumed
+minAbsoluteLatencyDeltaMs: 1.0  # ignore latency changes smaller than 1 ms (noise floor)
+requireIntegrity: true          # any lost/corrupt acked message is an automatic FAIL

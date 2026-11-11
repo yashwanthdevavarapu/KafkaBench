@@ -1,0 +1,16 @@
+# Durability vs latency trade-off: acks=1 (leader only). Compare against baseline.yaml (acks=all).
+name: acks-1-leader-only
+description: Same shape as the baseline but acks=1 and no idempotence.
+topic: kafkacore-acks1
+partitions: 6
+replicationFactor: 3
+messageSizeBytes: 1024
+producers: 2
+consumers: 2
+targetRatePerSec: 2000
+durationSec: 20
+warmupSec: 5
+producerConfig:
+  acks: "1"
+  enable.idempotence: "false"
+  linger.ms: "5"

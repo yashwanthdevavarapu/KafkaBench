@@ -1,0 +1,20 @@
+# Reference workload used as the regression baseline (benchmarks/baselines/baseline.json).
+# Durable settings: acks=all + idempotence, RF=3, min.insync.replicas=2.
+name: baseline-1k-acks-all
+description: 1 KiB messages at a fixed 2k msg/s, durable producer settings (laptop-sized; raise targetRatePerSec on real hardware).
+topic: kafkacore-baseline
+partitions: 6
+replicationFactor: 3
+messageSizeBytes: 1024
+producers: 2
+consumers: 2
+targetRatePerSec: 2000
+durationSec: 20
+warmupSec: 5
+producerConfig:
+  acks: all
+  enable.idempotence: "true"
+  linger.ms: "5"
+  batch.size: "65536"
+topicConfig:
+  min.insync.replicas: "2"

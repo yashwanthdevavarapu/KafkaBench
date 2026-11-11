@@ -1,0 +1,17 @@
+# Throughput and tail latency as a function of message size (unthrottled, durable settings).
+name: size-sweep
+description: Unthrottled producers across message sizes from 128 B to 32 KiB.
+topic: kafkacore-sweep
+partitions: 6
+replicationFactor: 3
+producers: 2
+consumers: 2
+targetRatePerSec: 0
+durationSec: 15
+warmupSec: 3
+producerConfig:
+  acks: all
+  linger.ms: "10"
+  batch.size: "131072"
+sweep:
+  messageSizeBytes: [128, 1024, 8192, 32768]
