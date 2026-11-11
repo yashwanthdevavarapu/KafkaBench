@@ -1,0 +1,105 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  unit:
+    name: Build & unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Build, unit tests, coverage
+        run: ./gradlew build --console=plain
+      - name: Upload test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit-test-reports
+          path: |
+            */build/reports/tests/test/
+            */build/reports/jacoco/test/html/
+
+  integration:
+    name: Cluster integration + fault injection
+    runs-on: ubuntu-latest
+    needs: unit
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Start 3-node KRaft cluster
+        run: docker compose -f docker/docker-compose.yml up -d --wait --wait-timeout 240
+      - name: Integration & chaos tests
+        run: ./gradlew :kafkacore-it:integrationTest --console=plain
+      - name: Publish chaos summary
+        if: always()
+        run: cat build/it-results/chaos-summary.md >> "$GITHUB_STEP_SUMMARY" || true
+      - name: Upload results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: integration-results
+          path: |
+            build/it-results/
+            kafkacore-it/build/reports/tests/integrationTest/
+      - name: Broker logs on failure
+        if: failure()
+        run: docker compose -f docker/docker-compose.yml logs --tail=300
+      - name: Tear down
+        if: always()
+        run: docker compose -f docker/docker-compose.yml down -v
+
+  benchmark-regression:
+    name: Benchmark regression gate
+    runs-on: ubuntu-latest
+    needs: unit
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - uses: gradle/actions/setup-gradle@v4
+      - run: ./gradlew :kafkacore-cli:installDist --console=plain
+      - run: docker compose -f docker/docker-compose.yml up -d --wait --wait-timeout 240
+      # Baselines are hardware-specific (ADR-0008): measure the base branch and the PR on the same runner.
+      - name: Benchmark base revision
+        if: github.event_name == 'pull_request'
+        run: |
+          git fetch --depth=1 origin "${{ github.base_ref }}"
+          git worktree add ../base "origin/${{ github.base_ref }}"
+          (cd ../base && ./gradlew :kafkacore-cli:installDist -q && \
+            ./kafkacore-cli/build/install/kafkacore/bin/kafkacore bench run workloads/baseline.yaml -o "$GITHUB_WORKSPACE/results/base")
+      - name: Benchmark this revision
+        run: ./kafkacore-cli/build/install/kafkacore/bin/kafkacore bench run workloads/baseline.yaml -o results/current
+      - name: Regression gate
+        if: github.event_name == 'pull_request'
+        run: |
+          ./kafkacore-cli/build/install/kafkacore/bin/kafkacore bench compare \
+            --baseline results/base/results.json --current results/current/results.json \
+            --policy workloads/regression-policy.yaml \
+            --markdown "$GITHUB_STEP_SUMMARY" --html results/current/regression.html
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: benchmark-results
+          path: results/
+      - if: always()
+        run: docker compose -f docker/docker-compose.yml down -v
