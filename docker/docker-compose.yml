@@ -1,0 +1,88 @@
+# KafkaCore Lab — 3-node Apache Kafka cluster in KRaft combined mode (see ADR-0003).
+# Every node is both a broker and a KRaft controller voter. No ZooKeeper.
+#
+#   docker compose -f docker/docker-compose.yml up -d
+#
+# Host access (advertised to clients): localhost:19092, localhost:29092, localhost:39092
+name: kafkacore
+
+x-kafka-common: &kafka-common
+  image: ${KAFKA_IMAGE:-apache/kafka:4.0.0}
+  restart: "no"            # fault-injection owns the lifecycle; never auto-restart a killed broker
+  networks: [kafkacore-net]
+  # Cheap TCP probe. Do NOT use kafka-broker-api-versions.sh here: it boots a JVM on every probe,
+  # which on a laptop starves the brokers and destabilises KRaft elections. Deep readiness
+  # (quorum leader, all brokers unfenced, 0 URP) is checked by `kafkacore cluster up` via the Admin API.
+  healthcheck:
+    test: ["CMD-SHELL", "nc -z localhost 9092"]
+    interval: 5s
+    timeout: 3s
+    retries: 40
+    start_period: 10s
+
+x-kafka-env: &kafka-env
+  CLUSTER_ID: "S0ZrYWNvcmVMYWItQ2x1c3Rlcg"
+  KAFKA_PROCESS_ROLES: "broker,controller"
+  KAFKA_CONTROLLER_QUORUM_VOTERS: "1@kafka-1:9093,2@kafka-2:9093,3@kafka-3:9093"
+  KAFKA_CONTROLLER_LISTENER_NAMES: "CONTROLLER"
+  KAFKA_INTER_BROKER_LISTENER_NAME: "INTERNAL"
+  KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: "CONTROLLER:PLAINTEXT,INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT"
+  KAFKA_LOG_DIRS: "/var/lib/kafka/data"
+  # Durability defaults that make the fault-injection guarantees meaningful.
+  KAFKA_DEFAULT_REPLICATION_FACTOR: "3"
+  KAFKA_MIN_INSYNC_REPLICAS: "2"
+  KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: "3"
+  KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: "3"
+  KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: "2"
+  KAFKA_UNCLEAN_LEADER_ELECTION_ENABLE: "false"
+  KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false"
+  KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: "0"
+  # Failure-detection timings (all observable in the chaos reports):
+  #  - replica.lag.time.max.ms: follower dropped from ISR after 10 s without catching up (default 30 s)
+  #  - broker.session.timeout.ms / heartbeat: controller fences a silent broker after 9 s (Kafka defaults)
+  #  - controller.quorum.*: Raft election / fetch timeouts for the metadata quorum (Kafka defaults)
+  KAFKA_REPLICA_LAG_TIME_MAX_MS: "10000"
+  KAFKA_BROKER_SESSION_TIMEOUT_MS: "9000"
+  KAFKA_BROKER_HEARTBEAT_INTERVAL_MS: "2000"
+  KAFKA_CONTROLLER_QUORUM_ELECTION_TIMEOUT_MS: "1000"
+  KAFKA_CONTROLLER_QUORUM_FETCH_TIMEOUT_MS: "2000"
+  # Keep memory modest so the whole lab runs on an 8 GB laptop.
+  KAFKA_HEAP_OPTS: "-Xms384m -Xmx384m"
+
+services:
+  kafka-1:
+    <<: *kafka-common
+    container_name: kafka-1
+    hostname: kafka-1
+    ports: ["19092:19092"]
+    environment:
+      <<: *kafka-env
+      KAFKA_NODE_ID: "1"
+      KAFKA_LISTENERS: "INTERNAL://:9092,CONTROLLER://:9093,EXTERNAL://:19092"
+      KAFKA_ADVERTISED_LISTENERS: "INTERNAL://kafka-1:9092,EXTERNAL://localhost:19092"
+
+  kafka-2:
+    <<: *kafka-common
+    container_name: kafka-2
+    hostname: kafka-2
+    ports: ["29092:29092"]
+    environment:
+      <<: *kafka-env
+      KAFKA_NODE_ID: "2"
+      KAFKA_LISTENERS: "INTERNAL://:9092,CONTROLLER://:9093,EXTERNAL://:29092"
+      KAFKA_ADVERTISED_LISTENERS: "INTERNAL://kafka-2:9092,EXTERNAL://localhost:29092"
+
+  kafka-3:
+    <<: *kafka-common
+    container_name: kafka-3
+    hostname: kafka-3
+    ports: ["39092:39092"]
+    environment:
+      <<: *kafka-env
+      KAFKA_NODE_ID: "3"
+      KAFKA_LISTENERS: "INTERNAL://:9092,CONTROLLER://:9093,EXTERNAL://:39092"
+      KAFKA_ADVERTISED_LISTENERS: "INTERNAL://kafka-3:9092,EXTERNAL://localhost:39092"
+
+networks:
+  kafkacore-net:
+    name: kafkacore-net
