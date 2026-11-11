@@ -1,0 +1,312 @@
+[ {
+  "runId" : "41c92602",
+  "workload" : {
+    "name" : "baseline-1k-acks-all",
+    "description" : "1 KiB messages at a fixed 2k msg/s, durable producer settings (laptop-sized; raise targetRatePerSec on real hardware).",
+    "topic" : "kafkacore-baseline",
+    "partitions" : 6,
+    "replicationFactor" : 3,
+    "messageSizeBytes" : 1024,
+    "producers" : 2,
+    "consumers" : 2,
+    "targetRatePerSec" : 2000,
+    "durationSec" : 20,
+    "warmupSec" : 5,
+    "keyStrategy" : "NONE",
+    "producerConfig" : {
+      "acks" : "all",
+      "enable.idempotence" : "true",
+      "batch.size" : "65536",
+      "linger.ms" : "5"
+    },
+    "consumerConfig" : { },
+    "topicConfig" : {
+      "min.insync.replicas" : "2"
+    }
+  },
+  "metadata" : {
+    "startedAt" : "2026-11-11T15:33:26.799004500Z",
+    "host" : "unknown",
+    "os" : "Windows 11 amd64",
+    "cpus" : 8,
+    "javaVersion" : "17.0.20",
+    "kafkaClientVersion" : "4.0.0",
+    "bootstrapServers" : "localhost:19092,localhost:29092,localhost:39092",
+    "gitCommit" : "local"
+  },
+  "throughput" : {
+    "producedMsgsPerSec" : 2282.8,
+    "producedMBPerSec" : 2.23,
+    "consumedMsgsPerSec" : 2292.24,
+    "consumedMBPerSec" : 2.24,
+    "totalSent" : 52270,
+    "totalAcked" : 52270,
+    "totalErrors" : 0,
+    "measuredSeconds" : 20.01
+  },
+  "publishLatency" : {
+    "count" : 46040,
+    "minMs" : 10.112,
+    "meanMs" : 917.153,
+    "p50Ms" : 313.599,
+    "p95Ms" : 3399.679,
+    "p99Ms" : 4048.895,
+    "p999Ms" : 4665.343,
+    "maxMs" : 4714.495
+  },
+  "endToEndLatency" : {
+    "count" : 46166,
+    "minMs" : 9.856,
+    "meanMs" : 929.381,
+    "p50Ms" : 319.487,
+    "p95Ms" : 3442.687,
+    "p99Ms" : 4034.559,
+    "p999Ms" : 4673.535,
+    "maxMs" : 4734.975
+  },
+  "integrity" : {
+    "acked" : 52270,
+    "sendFailed" : 0,
+    "received" : 52270,
+    "lost" : 0,
+    "duplicates" : 0,
+    "outOfOrder" : 0,
+    "corrupt" : 0,
+    "phantom" : 0
+  },
+  "resources" : {
+    "gauges" : {
+      "broker.kafka-1.cpu.pct" : {
+        "avg" : 217.62,
+        "max" : 230.79,
+        "samples" : 5
+      },
+      "broker.kafka-1.disk.write.mb" : {
+        "avg" : 16.25,
+        "max" : 47.68,
+        "samples" : 5
+      },
+      "broker.kafka-1.mem.mb" : {
+        "avg" : 381.9,
+        "max" : 392.9,
+        "samples" : 5
+      },
+      "broker.kafka-1.net.rx.mb" : {
+        "avg" : 44.12,
+        "max" : 61.23,
+        "samples" : 5
+      },
+      "broker.kafka-1.net.tx.mb" : {
+        "avg" : 33.45,
+        "max" : 51.4,
+        "samples" : 5
+      },
+      "broker.kafka-2.cpu.pct" : {
+        "avg" : 220.57,
+        "max" : 274.89,
+        "samples" : 5
+      },
+      "broker.kafka-2.disk.write.mb" : {
+        "avg" : 26.03,
+        "max" : 57.41,
+        "samples" : 5
+      },
+      "broker.kafka-2.mem.mb" : {
+        "avg" : 546.2,
+        "max" : 557.5,
+        "samples" : 5
+      },
+      "broker.kafka-2.net.rx.mb" : {
+        "avg" : 69.46,
+        "max" : 86.78,
+        "samples" : 5
+      },
+      "broker.kafka-2.net.tx.mb" : {
+        "avg" : 66.64,
+        "max" : 81.92,
+        "samples" : 5
+      },
+      "broker.kafka-3.cpu.pct" : {
+        "avg" : 246.2,
+        "max" : 326.67,
+        "samples" : 5
+      },
+      "broker.kafka-3.disk.write.mb" : {
+        "avg" : 16.13,
+        "max" : 44.44,
+        "samples" : 5
+      },
+      "broker.kafka-3.mem.mb" : {
+        "avg" : 533.38,
+        "max" : 551.8,
+        "samples" : 5
+      },
+      "broker.kafka-3.net.rx.mb" : {
+        "avg" : 54.49,
+        "max" : 72.57,
+        "samples" : 5
+      },
+      "broker.kafka-3.net.tx.mb" : {
+        "avg" : 46.82,
+        "max" : 65.99,
+        "samples" : 5
+      },
+      "client.cpu.pct" : {
+        "avg" : 10.83,
+        "max" : 21.79,
+        "samples" : 9
+      },
+      "client.gc.ms" : {
+        "avg" : 7.33,
+        "max" : 51.0,
+        "samples" : 9
+      },
+      "client.heap.mb" : {
+        "avg" : 54.99,
+        "max" : 81.33,
+        "samples" : 9
+      }
+    }
+  },
+  "timeline" : [ {
+    "second" : 1,
+    "producedMsgs" : 2772,
+    "consumedMsgs" : 2898,
+    "publishP99Ms" : 4052.991,
+    "endToEndP99Ms" : 4038.655,
+    "errors" : 0
+  }, {
+    "second" : 2,
+    "producedMsgs" : 1229,
+    "consumedMsgs" : 1355,
+    "publishP99Ms" : 4161.535,
+    "endToEndP99Ms" : 4120.575,
+    "errors" : 0
+  }, {
+    "second" : 3,
+    "producedMsgs" : 1840,
+    "consumedMsgs" : 1777,
+    "publishP99Ms" : 4419.583,
+    "endToEndP99Ms" : 4411.391,
+    "errors" : 0
+  }, {
+    "second" : 4,
+    "producedMsgs" : 3843,
+    "consumedMsgs" : 3780,
+    "publishP99Ms" : 4673.535,
+    "endToEndP99Ms" : 4694.015,
+    "errors" : 0
+  }, {
+    "second" : 5,
+    "producedMsgs" : 4817,
+    "consumedMsgs" : 4817,
+    "publishP99Ms" : 4169.727,
+    "endToEndP99Ms" : 4157.439,
+    "errors" : 0
+  }, {
+    "second" : 6,
+    "producedMsgs" : 3113,
+    "consumedMsgs" : 3176,
+    "publishP99Ms" : 1465.343,
+    "endToEndP99Ms" : 1480.703,
+    "errors" : 0
+  }, {
+    "second" : 7,
+    "producedMsgs" : 1636,
+    "consumedMsgs" : 1592,
+    "publishP99Ms" : 430.335,
+    "endToEndP99Ms" : 453.887,
+    "errors" : 0
+  }, {
+    "second" : 8,
+    "producedMsgs" : 2145,
+    "consumedMsgs" : 2189,
+    "publishP99Ms" : 522.239,
+    "endToEndP99Ms" : 643.071,
+    "errors" : 0
+  }, {
+    "second" : 9,
+    "producedMsgs" : 2043,
+    "consumedMsgs" : 1980,
+    "publishP99Ms" : 453.631,
+    "endToEndP99Ms" : 442.367,
+    "errors" : 0
+  }, {
+    "second" : 10,
+    "producedMsgs" : 2109,
+    "consumedMsgs" : 2202,
+    "publishP99Ms" : 374.015,
+    "endToEndP99Ms" : 358.399,
+    "errors" : 0
+  }, {
+    "second" : 11,
+    "producedMsgs" : 1867,
+    "consumedMsgs" : 1844,
+    "publishP99Ms" : 400.895,
+    "endToEndP99Ms" : 401.151,
+    "errors" : 0
+  }, {
+    "second" : 12,
+    "producedMsgs" : 2368,
+    "consumedMsgs" : 2361,
+    "publishP99Ms" : 316.671,
+    "endToEndP99Ms" : 316.671,
+    "errors" : 0
+  }, {
+    "second" : 13,
+    "producedMsgs" : 1470,
+    "consumedMsgs" : 1461,
+    "publishP99Ms" : 370.175,
+    "endToEndP99Ms" : 409.343,
+    "errors" : 0
+  }, {
+    "second" : 14,
+    "producedMsgs" : 2332,
+    "consumedMsgs" : 2341,
+    "publishP99Ms" : 504.063,
+    "endToEndP99Ms" : 513.279,
+    "errors" : 0
+  }, {
+    "second" : 15,
+    "producedMsgs" : 2013,
+    "consumedMsgs" : 1984,
+    "publishP99Ms" : 196.991,
+    "endToEndP99Ms" : 195.071,
+    "errors" : 0
+  }, {
+    "second" : 16,
+    "producedMsgs" : 1833,
+    "consumedMsgs" : 1862,
+    "publishP99Ms" : 377.855,
+    "endToEndP99Ms" : 379.135,
+    "errors" : 0
+  }, {
+    "second" : 17,
+    "producedMsgs" : 2155,
+    "consumedMsgs" : 2155,
+    "publishP99Ms" : 471.807,
+    "endToEndP99Ms" : 471.551,
+    "errors" : 0
+  }, {
+    "second" : 18,
+    "producedMsgs" : 1058,
+    "consumedMsgs" : 1058,
+    "publishP99Ms" : 348.671,
+    "endToEndP99Ms" : 347.903,
+    "errors" : 0
+  }, {
+    "second" : 19,
+    "producedMsgs" : 2728,
+    "consumedMsgs" : 2622,
+    "publishP99Ms" : 728.063,
+    "endToEndP99Ms" : 736.767,
+    "errors" : 0
+  }, {
+    "second" : 20,
+    "producedMsgs" : 2313,
+    "consumedMsgs" : 2419,
+    "publishP99Ms" : 609.791,
+    "endToEndP99Ms" : 609.791,
+    "errors" : 0
+  } ]
+} ]
